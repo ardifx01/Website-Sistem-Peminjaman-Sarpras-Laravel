@@ -46,7 +46,7 @@ return [
     */
 
     'logo' => '',
-    'logo_img' => 'assets/img/navbar-brand.svg',
+    'logo_img' => 'assets/img/brand.png',
     'logo_img_class' => 'brand-image ',
     'logo_img_xl' => '',
     'logo_img_xl_class' => 'brand-image-xs',

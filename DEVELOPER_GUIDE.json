@@ -1,0 +1,267 @@
+{
+  "project_overview": {
+    "name": "Website Peminjaman Sarpras",
+    "framework": "Laravel (PHP)",
+    "modules": [
+      "Nwidart/laravel-modules (contoh: Modules/Kepegawaian)"
+    ],
+    "ui": [
+      "AdminLTE",
+      "Argon Dashboard"
+    ]
+  },
+  "tech_stack": {
+    "php": "mengacu composer.lock (PHP 7/8)",
+    "laravel_packages": [
+      "spatie/laravel-permission",
+      "nwidart/laravel-modules"
+    ],
+    "frontend_assets": [
+      "Argon assets (public/argon)",
+      "AdminLTE (config/adminlte.php, resources/views/layouts)"
+    ]
+  },
+  "repository_layout": {
+    "app": "app/* (Controllers, Middleware, Providers, Models di app/Models/Core)",
+    "modules": "Modules/* (fitur modular, contoh: Modules/Kepegawaian)",
+    "resources_views": "resources/views/* (Blade templates)",
+    "routes": "routes/web.php, routes/api.php",
+    "database": "database/migrations/*, database/seeders/*",
+    "config": "config/* (termasuk adminlte, permission, services)"
+  },
+  "authentication_and_sso": {
+    "local_login": "Form username/password aktif jika SSO_ENABLE=false",
+    "sso": {
+      "toggle": "config('services.oauth_server.sso_enable') → env SSO_ENABLE",
+      "controllers": [
+        "app/Http/Controllers/Autentikasi/OAuthController.php",
+        "app/Http/Controllers/Autentikasi/LoginController.php"
+      ],
+      "routes": [
+        "GET /oauth/login → redirect ke OAuth server",
+        "GET /oauth/callback → tukar code ke token, provisioning user",
+        "GET /oauth/refresh → refresh token"
+      ],
+      "provisioning": "User dibuat/diupdate otomatis dari data SSO (username, name, email, unit, staff, role)"
+    }
+  },
+  "authorization_permissions": {
+    "package": "spatie/laravel-permission",
+    "config": "config/permission.php",
+    "migrations": "database/migrations/2022_05_24_055057_create_permission_tables.php",
+    "controllers_ui": [
+      "app/Http/Controllers/Core/RolesController.php",
+      "app/Http/Controllers/Core/PermissionsController.php"
+    ],
+    "routes_ui": [
+      "Route::resource('roles', RolesController::class)",
+      "Route::resource('permissions', PermissionsController::class)"
+    ],
+    "role_switching": "POST /peran (SwitchController@perform) untuk beralih peran"
+  },
+  "menus_and_navigation": {
+    "tables": [
+      "menus (id, modul, label, url, icon, active, can, parent_id, urut)"
+    ],
+    "notes": "Kolom 'can' untuk permission; dukung parent-child via parent_id"
+  },
+  "database_and_migrations": {
+    "core_tables": [
+      "users (unit, staff, status, role_aktif, avatar, profil tambahan)",
+      "units, staffs (lookup)",
+      "oauth_tokens",
+      "sessions (single-device)",
+      "spatie: roles, permissions, model_has_roles, model_has_permissions, role_has_permissions",
+      "menus",
+      "login_activities, failed_jobs, personal_access_tokens, password_resets"
+    ],
+    "seeders": [
+      "database/seeders/CreateAdminUserSeeder.php",
+      "database/seeders/MenusTableSeeder.php",
+      "database/seeders/DatabaseSeeder.php"
+    ],
+    "gotchas": [
+      "Pastikan nama tabel di method down() konsisten (units/staffs)"
+    ]
+  },
+  "routes_and_middleware": {
+    "web_groups": [
+      "guest: halaman login, SSO routes",
+      "auth + permission: area aplikasi utama"
+    ],
+    "permissions_middleware": "Custom middleware 'permission' untuk proteksi route",
+    "monitoring_routes": [
+      "/logged-in-devices, /logout/all, /logout/{device_id}, /login-activity"
+    ]
+  },
+  "css_components": {
+    "purpose": "Menyediakan sistem komponen UI berbasis Blade + CSS murni tanpa Tailwind/Bootstrap.",
+    "principles": [
+      "Tanpa dependensi CSS/JS eksternal.",
+      "Gunakan BEM (Block__Element--Modifier).",
+      "Aksesibilitas: fokus jelas, kontras memadai, ARIA seperlunya.",
+      "Responsif sederhana dengan breakpoint mobile-first."
+    ],
+    "directory_structure": {
+      "views_components": "resources/views/components/ui/*.blade.php",
+      "css": "resources/css/ui/*.css (gabungkan ke satu file ui.css)",
+      "public_css": "public/assets/css/ui.css (tautan langsung via layout)"
+    },
+    "include_in_layout": {
+      "blade": "Tambahkan <link rel=\"stylesheet\" href=\"{{ url('assets/css/ui.css') }}\"> pada layout utama (resources/views/layouts/*).",
+      "no_build_tool": "Jika tanpa build tool, salin ui.css ke public/assets/css/ dan rawat manual."
+    },
+    "naming_conventions": {
+      "block": "btn, card, alert, input, modal",
+      "element": "card__header, card__body, modal__footer",
+      "modifier": "btn--primary, alert--error, input--invalid"
+    },
+    "responsive_breakpoints": {
+      "sm": "min-width: 576px",
+      "md": "min-width: 768px",
+      "lg": "min-width: 992px"
+    },
+    "recommended_components": [
+      "Button (btn, btn--primary, btn--secondary, btn--ghost)",
+      "Card (card, card__header, card__body, card__footer)",
+      "Alert (alert, alert--info|success|warning|error)",
+      "Form Controls (input, input--invalid, label, help-text)",
+      "Badge (badge, badge--neutral|info|success|warning|error)",
+      "Modal (modal, modal__overlay, modal__content, modal__footer) – JS vanilla ringan",
+      "Table (table, table--striped, table--compact)"
+    ],
+    "blade_component_examples": {
+      "button": {
+        "path": "resources/views/components/ui/button.blade.php",
+        "props": ["variant", "size", "type"],
+        "usage": "<x-ui.button variant=\"primary\">Simpan</x-ui.button>"
+      },
+      "card": {
+        "path": "resources/views/components/ui/card.blade.php",
+        "slots": ["header", "footer"],
+        "usage": "<x-ui.card><x-slot:header>Judul</x-slot:header>Konten</x-ui.card>"
+      }
+    },
+    "css_skeleton": {
+      "buttons": [
+        ".btn { display:inline-flex; gap:.5rem; align-items:center; border:1px solid transparent; padding:.5rem .875rem; border-radius:.375rem; background:#efefef; color:#111; cursor:pointer; text-decoration:none; }",
+        ".btn:focus { outline:2px solid #4c9ffe; outline-offset:2px; }",
+        ".btn--primary { background:#2563eb; color:#fff; }",
+        ".btn--secondary { background:#e5e7eb; color:#111; }",
+        ".btn--ghost { background:transparent; border-color:#cbd5e1; color:#111; }"
+      ],
+      "card": [
+        ".card { border:1px solid #e5e7eb; border-radius:.5rem; background:#fff; }",
+        ".card__header { padding:.75rem 1rem; border-bottom:1px solid #e5e7eb; font-weight:600; }",
+        ".card__body { padding:1rem; }",
+        ".card__footer { padding:.75rem 1rem; border-top:1px solid #e5e7eb; text-align:right; }"
+      ],
+      "alert": [
+        ".alert { padding:.75rem 1rem; border-radius:.375rem; border:1px solid transparent; }",
+        ".alert--info { background:#eff6ff; color:#1e3a8a; border-color:#bfdbfe; }",
+        ".alert--success { background:#ecfdf5; color:#065f46; border-color:#a7f3d0; }",
+        ".alert--warning { background:#fffbeb; color:#92400e; border-color:#fde68a; }",
+        ".alert--error { background:#fef2f2; color:#991b1b; border-color:#fecaca; }"
+      ]
+    },
+    "accessibility": [
+      "Pastikan state fokus terlihat.",
+      "Gunakan aria-* untuk modal/alert bila diperlukan.",
+      "Kontras minimal 4.5:1 untuk teks."
+    ],
+    "migration_strategy": [
+      "Mulai dari halaman baru menggunakan komponen UI baru.",
+      "Refactor bertahap halaman lama: ganti elemen per elemen (button → card → form).",
+      "Hindari mixing framework CSS lama dan baru pada satu elemen."
+    ]
+  },
+  "development_workflow": {
+    "setup": [
+      "cp .env.example .env (atau sesuaikan)",
+      "composer install",
+      "php artisan key:generate",
+      "Set .env untuk DB, SSO_ENABLE, OAUTH_SERVER_*",
+      "php artisan migrate --seed",
+      "php artisan storage:link (opsional)"
+    ],
+    "running": [
+      "php artisan serve",
+      "Pastikan asset publik tersedia"
+    ],
+    "feature_development": [
+      "Tambahkan Controller di namespace sesuai (Core/Autentikasi/Monitor/Modules.*)",
+      "Daftarkan route (guest atau auth+permission)",
+      "Buat migrasi untuk perubahan DB",
+      "Tambah permission baru dan kaitkan ke role",
+      "Tambahkan item menu di tabel 'menus' (kolom 'can')",
+      "Untuk UI baru, gunakan komponen CSS kustom di resources/views/components/ui"
+    ],
+    "modules": [
+      "Untuk domain-spesifik, gunakan Nwidart modules",
+      "Definisikan route modul di Modules/*/Routes/* dan views di Modules/*/Resources/views"
+    ],
+    "testing": [
+      "php artisan test",
+      "Tambahkan test di tests/Feature dan tests/Unit"
+    ]
+  },
+  "security_and_policies": {
+    "session_policy": "Single-device: sesi lain dihapus saat login",
+    "sso_tokens": "Simpan di oauth_tokens; gunakan refresh saat kedaluwarsa",
+    "permissions": "Gunakan spatie permission di route terlindungi",
+    "csrf": "Gunakan @csrf pada form blade",
+    "env_secrets": "Rahasiakan kredensial SSO/DB di .env"
+  },
+  "deployment": {
+    "build_steps": [
+      "composer install --no-dev --optimize-autoloader",
+      "php artisan config:cache",
+      "php artisan route:cache",
+      "php artisan view:cache",
+      "php artisan migrate --force"
+    ],
+    "env_requirements": [
+      "SSO_ENABLE sesuai kebutuhan",
+      "OAUTH_SERVER_ID, OAUTH_SERVER_SECRET, OAUTH_SERVER_REDIRECT_URI, OAUTH_SERVER_URI, OAUTH_SERVER_LOGOUT_URI"
+    ],
+    "file_permissions": [
+      "storage/* dan bootstrap/cache writable"
+    ]
+  },
+  "custom_commands_and_automation": {
+    "path": "app/Console/Commands/*",
+    "purpose": "Sinkronisasi permission dari route",
+    "note": "Cek app/Console/Kernel.php untuk jadwal/pemakaian"
+  },
+  "contributing_notes": {
+    "branching": "Gunakan pola feature/*, fix/*",
+    "code_review": "PR kecil, deskripsi jelas, migrasi terpisah",
+    "database_changes": "Selalu lewat migrasi; update seeder bila perlu",
+    "permissions_update": "Tambahkan permission baru untuk setiap action baru"
+  },
+  "troubleshooting": {
+    "sso_not_showing": "Pastikan SSO_ENABLE=true dan php artisan config:clear",
+    "permission_denied": "Pastikan role user memiliki permission; cek middleware",
+    "cannot_login_multiple_devices": "Single-device aktif; nonaktifkan penghapusan sesi jika perlu",
+    "mismatch_down_migration": "Perbaiki nama tabel di method down() pada migrasi units/staffs"
+  },
+  "file_references": [
+    "routes/web.php",
+    "app/Http/Controllers/Autentikasi/*",
+    "app/Http/Controllers/Core/*",
+    "app/Http/Middleware/*",
+    "app/Providers/*",
+    "app/Models/Core/*",
+    "database/migrations/*",
+    "database/seeders/*",
+    "resources/views/*",
+    "config/services.php",
+    "config/permission.php",
+    "config/adminlte.php",
+    "Modules/Kepegawaian/*"
+  ],
+  "last_updated": "2025-09-07"
+}
+
+
+

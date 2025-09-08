@@ -58,6 +58,12 @@ Route::group(['namespace' => 'App\Http\Controllers\Core'], function()
 		Route::resource('roles', RolesController::class);
         Route::resource('permissions', PermissionsController::class);	
 	});
+
+	// Setup profile (tanpa permission, hanya cek auth)
+	Route::group(['middleware' => ['auth']], function() {
+		Route::get('/profile/setup', 'ProfileSetupController@show')->name('profile.setup.show');
+		Route::post('/profile/setup', 'ProfileSetupController@store')->name('profile.setup.store');
+	});
 });
 
 Route::group(['namespace' => 'App\Http\Controllers\Autentikasi'], function()
